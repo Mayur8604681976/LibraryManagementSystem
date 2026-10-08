@@ -1,0 +1,4248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>The Reading Room — Library Management System</title>
+
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap');
+
+:root{
+    --bg:#f3eee4;
+    --paper:#fffdf8;
+    --paper2:#f8f3e9;
+    --wood:#5b3825;
+    --wood2:#7a5033;
+    --gold:#b88735;
+    --gold2:#d5ad5b;
+    --green:#49624b;
+    --red:#a64b3c;
+    --ink:#2f2923;
+    --muted:#7b7268;
+    --line:#ded4c4;
+    --shadow:0 8px 24px rgba(69,49,31,.09);
+
+    --head:'DM Serif Display',serif;
+    --body:'Inter',sans-serif;
+    --serif:'Libre Baskerville',serif;
+
+    --sw:245px;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body {
+    font-family: var(--body);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+
+    background:
+        linear-gradient(
+            rgba(35, 23, 15, 0.65),
+            rgba(35, 23, 15, 0.65)
+        ),
+        url("/static/library_bg.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+button,
+input,
+select,
+textarea{
+    font:inherit;
+}
+
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-track{
+    background:#eee6d9;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#c1ae95;
+    border-radius:20px;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+    width:var(--sw);
+    position:fixed;
+    inset:0 auto 0 0;
+
+    background:var(--wood);
+    color:#fff9ed;
+
+    border-right:5px solid var(--gold);
+
+    display:flex;
+    flex-direction:column;
+
+    z-index:20;
+    overflow:auto;
+
+    box-shadow:5px 0 24px rgba(51,31,19,.12);
+}
+
+.brand{
+    padding:27px 22px 24px;
+
+    border-bottom:1px solid rgba(255,255,255,.14);
+
+    background:
+        linear-gradient(
+            145deg,
+            #4d2e1f,
+            #6c4229
+        );
+}
+
+.brand-icon{
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    background:#f4e4bd;
+    color:var(--wood);
+
+    display:grid;
+    place-items:center;
+
+    font-size:25px;
+
+    margin-bottom:13px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.18);
+}
+
+.brand h1{
+    font:1.55rem var(--head);
+    letter-spacing:.2px;
+}
+
+.brand small{
+    display:block;
+
+    font:9px var(--body);
+
+    color:#d9c8ae;
+
+    letter-spacing:.12em;
+    text-transform:uppercase;
+
+    margin-top:4px;
+}
+
+.nav{
+    padding:16px 12px;
+}
+
+.navlabel{
+    font:9px var(--body);
+
+    color:#c6ad91;
+
+    padding:13px 12px 7px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.16em;
+
+    font-weight:700;
+}
+
+.navitem{
+    display:flex;
+    align-items:center;
+
+    gap:12px;
+
+    color:#e4d6c2;
+
+    padding:11px 13px;
+
+    border-radius:7px;
+
+    margin:3px 0;
+
+    cursor:pointer;
+
+    font-size:13px;
+
+    transition:.2s;
+}
+
+.navitem:hover{
+    background:rgba(255,255,255,.09);
+    color:white;
+
+    transform:translateX(2px);
+}
+
+.navitem.active{
+    background:#f4e4bd;
+
+    color:var(--wood);
+
+    font-weight:700;
+
+    box-shadow:
+        inset 4px 0 0 var(--gold);
+}
+
+.navitem span:first-child{
+    width:21px;
+    text-align:center;
+    font-size:16px;
+}
+
+.sidebarfoot{
+    margin-top:auto;
+
+    border-top:1px solid rgba(255,255,255,.14);
+
+    padding:13px;
+}
+
+.staff{
+    background:rgba(255,255,255,.08);
+
+    padding:10px;
+
+    border-radius:8px;
+
+    display:flex;
+
+    gap:10px;
+
+    align-items:center;
+}
+
+.avatar{
+    width:36px;
+    height:36px;
+
+    border-radius:50%;
+
+    background:#e4c37d;
+
+    color:var(--wood);
+
+    display:grid;
+    place-items:center;
+
+    font-weight:700;
+    font-size:12px;
+}
+
+.staff small{
+    display:block;
+
+    color:#cbb79d;
+
+    font-size:10px;
+
+    margin-top:2px;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+main{
+    margin-left:var(--sw);
+
+    width:calc(100% - var(--sw));
+
+    min-height:100vh;
+
+    background:rgba(245,238,226,.82);
+}
+
+.top{
+    height:68px;
+
+    position:sticky;
+    top:0;
+
+    z-index:10;
+
+    background:rgba(255,253,248,.94);
+
+    backdrop-filter:blur(12px);
+
+    border-bottom:1px solid var(--line);
+
+    display:flex;
+    align-items:center;
+
+    padding:0 31px;
+
+    gap:15px;
+
+    box-shadow:
+        0 2px 10px rgba(70,50,30,.04);
+}
+
+.top h2{
+    font:1.25rem var(--head);
+
+    flex:1;
+
+    color:var(--wood);
+}
+
+.date{
+    font:10px monospace;
+
+    color:var(--muted);
+
+    background:var(--paper2);
+
+    padding:7px 10px;
+
+    border-radius:5px;
+}
+
+.content{
+    padding:30px;
+
+    max-width:1500px;
+}
+
+/* =========================
+   PAGES
+========================= */
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+
+    animation:in .25s ease;
+}
+
+@keyframes in{
+    from{
+        opacity:0;
+        transform:translateY(8px);
+    }
+
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.title{
+    font:1.85rem var(--head);
+
+    color:var(--wood);
+
+    margin-bottom:5px;
+}
+
+.sub{
+    color:var(--muted);
+
+    font-size:12px;
+
+    margin-bottom:22px;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+    position:relative;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6b442c,
+            #8b603d
+        );
+
+    color:#fff8ec;
+
+    border-radius:12px;
+
+    padding:25px 28px;
+
+    margin-bottom:22px;
+
+    overflow:hidden;
+
+    box-shadow:var(--shadow);
+}
+
+.hero:after{
+    content:'📖';
+
+    position:absolute;
+
+    right:35px;
+    bottom:-22px;
+
+    font-size:105px;
+
+    opacity:.12;
+
+    transform:rotate(-10deg);
+}
+
+.hero h3{
+    font:1.55rem var(--head);
+
+    margin-bottom:6px;
+}
+
+.hero p{
+    font-size:12px;
+
+    color:#eadcc9;
+
+    max-width:580px;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stats{
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:15px;
+
+    margin-bottom:22px;
+}
+
+.stat,
+.card{
+    background:var(--paper);
+
+    border:1px solid var(--line);
+
+    border-radius:10px;
+
+    box-shadow:var(--shadow);
+}
+
+.stat{
+    padding:18px;
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+.stat:before{
+    content:'';
+
+    position:absolute;
+
+    top:0;
+    left:0;
+    bottom:0;
+
+    width:4px;
+
+    background:var(--gold);
+}
+
+.stat:nth-child(2):before{
+    background:var(--green);
+}
+
+.stat:nth-child(3):before{
+    background:#c18b3b;
+}
+
+.stat:nth-child(4):before{
+    background:#8b6b4a;
+}
+
+.stat .icon{
+    font-size:23px;
+
+    margin-bottom:10px;
+}
+
+.value{
+    font:1.7rem monospace;
+
+    color:var(--wood);
+}
+
+.label{
+    font-size:11px;
+
+    color:var(--muted);
+
+    margin-top:3px;
+}
+
+/* =========================
+   GRID
+========================= */
+
+.grid2{
+    display:grid;
+
+    grid-template-columns:
+        1.25fr .75fr;
+
+    gap:18px;
+}
+
+.card{
+    overflow:hidden;
+
+    margin-bottom:18px;
+}
+
+.chead{
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:16px 19px;
+
+    border-bottom:1px solid var(--line);
+
+    background:var(--paper2);
+}
+
+.chead h3{
+    font:1.05rem var(--head);
+
+    color:var(--wood);
+}
+
+.cbody{
+    padding:18px;
+}
+
+/* =========================
+   TOOLBAR
+========================= */
+
+.toolbar{
+    display:flex;
+
+    gap:10px;
+
+    align-items:center;
+
+    margin-bottom:18px;
+}
+
+.search{
+    flex:1;
+
+    position:relative;
+}
+
+.search input{
+    padding-left:38px;
+}
+
+.search b{
+    position:absolute;
+
+    left:13px;
+    top:9px;
+
+    color:var(--muted);
+}
+
+/* =========================
+   FORM ELEMENTS
+========================= */
+
+input,
+select,
+textarea{
+    width:100%;
+
+    background:#fffdf8;
+
+    border:1px solid #d8cdbd;
+
+    border-radius:7px;
+
+    color:var(--ink);
+
+    padding:10px 12px;
+
+    outline:none;
+
+    font-size:12px;
+
+    transition:.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:var(--gold);
+
+    box-shadow:
+        0 0 0 3px rgba(184,135,53,.11);
+}
+
+textarea{
+    min-height:80px;
+
+    resize:vertical;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn{
+    border:0;
+
+    border-radius:7px;
+
+    padding:10px 14px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    font-size:12px;
+
+    transition:.18s;
+}
+
+.btn:hover{
+    transform:translateY(-1px);
+}
+
+.primary{
+    background:var(--wood);
+
+    color:#fff8ed;
+}
+
+.primary:hover{
+    background:#70462d;
+}
+
+.ghost{
+    background:#f6f0e5;
+
+    color:var(--wood);
+
+    border:1px solid #d9cdbb;
+}
+
+.danger{
+    background:#f8e8e4;
+
+    color:var(--red);
+}
+
+/* =========================
+   TABLES
+========================= */
+
+.table{
+    overflow:auto;
+}
+
+table{
+    width:100%;
+
+    border-collapse:collapse;
+
+    font-size:12px;
+}
+
+th{
+    padding:11px 13px;
+
+    text-align:left;
+
+    background:#eee5d6;
+
+    color:#695a4b;
+
+    font:9px monospace;
+
+    text-transform:uppercase;
+
+    letter-spacing:.08em;
+}
+
+td{
+    padding:12px 13px;
+
+    border-bottom:1px solid #e9e0d4;
+}
+
+tr:hover td{
+    background:#fcf8f0;
+}
+
+/* =========================
+   BADGES
+========================= */
+
+.badge{
+    display:inline-block;
+
+    border-radius:20px;
+
+    padding:4px 9px;
+
+    font:9px monospace;
+}
+
+.green{
+    background:#e6f0e7;
+
+    color:#496b4e;
+}
+
+.red{
+    background:#f7e4df;
+
+    color:#9c473b;
+}
+
+.amber{
+    background:#f7ecd7;
+
+    color:#9b6b25;
+}
+
+.blue{
+    background:#e4edf1;
+
+    color:#496f7c;
+}
+
+.purple{
+    background:#eee7dc;
+
+    color:#745d42;
+}
+
+.muted{
+    color:var(--muted);
+}
+
+.mono{
+    font-family:monospace;
+
+    font-size:10px;
+}
+
+.empty{
+    text-align:center;
+
+    padding:40px;
+
+    color:var(--muted);
+}
+
+/* =========================
+   PROGRESS BAR
+========================= */
+
+.bar{
+    height:8px;
+
+    background:#e9dfd0;
+
+    border-radius:9px;
+
+    overflow:hidden;
+}
+
+.bar i{
+    display:block;
+
+    height:100%;
+
+    background:var(--gold);
+
+    border-radius:9px;
+}
+
+/* =========================
+   ACTIVITY
+========================= */
+
+.activity{
+    display:flex;
+
+    gap:11px;
+
+    padding:11px 0;
+
+    border-bottom:1px solid #e8dfd2;
+}
+
+.activity:last-child{
+    border:0;
+}
+
+.dot{
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:var(--gold);
+
+    margin-top:5px;
+
+    flex:none;
+}
+
+.activity strong{
+    font-size:12px;
+}
+
+.activity small{
+    display:block;
+
+    color:var(--muted);
+
+    font-size:10px;
+
+    margin-top:3px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal{
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(54,37,23,.58);
+
+    z-index:100;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+}
+
+.modal.open{
+    display:flex;
+}
+
+.modalbox{
+    width:92%;
+
+    max-width:650px;
+
+    background:var(--paper);
+
+    border:1px solid var(--line);
+
+    border-radius:12px;
+
+    max-height:90vh;
+
+    overflow:auto;
+
+    box-shadow:
+        0 20px 60px rgba(45,29,18,.25);
+}
+
+.mh{
+    padding:18px 21px;
+
+    border-bottom:1px solid var(--line);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    background:var(--paper2);
+}
+
+.mh h3{
+    font:1.15rem var(--head);
+
+    color:var(--wood);
+}
+
+.close{
+    background:none;
+
+    border:0;
+
+    color:var(--muted);
+
+    font-size:20px;
+
+    cursor:pointer;
+}
+
+.mb{
+    padding:21px;
+}
+
+.formgrid{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:13px;
+}
+
+.full{
+    grid-column:1/-1;
+}
+
+.fg label{
+    display:block;
+
+    color:#75695b;
+
+    font:9px monospace;
+
+    margin-bottom:6px;
+
+    text-transform:uppercase;
+}
+
+.mf{
+    padding:14px 21px;
+
+    border-top:1px solid var(--line);
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:9px;
+
+    background:var(--paper2);
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+    position:fixed;
+
+    right:22px;
+    bottom:22px;
+
+    background:var(--wood);
+
+    color:#fff8ed;
+
+    border:1px solid #805b3d;
+
+    padding:12px 16px;
+
+    border-radius:7px;
+
+    z-index:200;
+
+    display:none;
+
+    font-size:12px;
+
+    box-shadow:var(--shadow);
+}
+
+.toast.show{
+    display:block;
+}
+
+.kpi{
+    font:1.5rem monospace;
+
+    color:var(--wood);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:1000px){
+
+    .stats{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+
+    .grid2{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:720px){
+
+    :root{
+        --sw:0px;
+    }
+
+    .sidebar{
+        transform:translateX(-245px);
+    }
+
+    main{
+        margin:0;
+
+        width:100%;
+    }
+
+    .content{
+        padding:18px;
+    }
+
+    .top{
+        padding:0 18px;
+    }
+
+    .formgrid{
+        grid-template-columns:1fr;
+    }
+
+    .stats{
+        grid-template-columns:
+            1fr 1fr;
+    }
+
+    .date{
+        display:none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+
+        <div class="brand-icon">
+            📚
+        </div>
+
+        <h1>The Reading Room</h1>
+
+        <small>
+            Library & Reading Room
+        </small>
+
+    </div>
+
+    <nav class="nav">
+
+        <div class="navlabel">
+            Overview
+        </div>
+
+        <div class="navitem active"
+             data-page="dashboard">
+
+            <span>◈</span>
+            Dashboard
+
+        </div>
+
+
+        <div class="navlabel">
+            Library
+        </div>
+
+        <div class="navitem"
+             data-page="books">
+
+            <span>📚</span>
+            Books
+
+        </div>
+
+        <div class="navitem"
+             data-page="members">
+
+            <span>👥</span>
+            Members
+
+        </div>
+
+        <div class="navitem"
+             data-page="loans">
+
+            <span>↔</span>
+            Issue & Return
+
+        </div>
+
+        <div class="navitem"
+             data-page="reservations">
+
+            <span>🔖</span>
+            Reservations
+
+        </div>
+
+        <div class="navitem"
+             data-page="fines">
+
+            <span>₹</span>
+            Fines
+
+        </div>
+
+
+        <div class="navlabel">
+            Directory
+        </div>
+
+        <div class="navitem"
+             data-page="staff">
+
+            <span>♙</span>
+            Staff
+
+        </div>
+
+        <div class="navitem"
+             data-page="catalog">
+
+            <span>⌘</span>
+            Catalog Data
+
+        </div>
+
+    </nav>
+
+
+    <div class="sidebarfoot">
+
+        <div class="staff">
+
+            <div class="avatar">
+                LC
+            </div>
+
+            <div>
+
+                <b style="font-size:12px">
+                    Library Admin
+                </b>
+
+                <small>
+                    Administrator
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================
+     MAIN CONTENT
+========================= -->
+
+<main>
+
+<header class="top">
+
+    <h2 id="topTitle">
+        Dashboard
+    </h2>
+
+    <span class="date"
+          id="today">
+    </span>
+
+    <button class="btn ghost"
+            onclick="refreshCurrent()">
+
+        ↻ Refresh
+
+    </button>
+
+</header>
+
+
+<div class="content">
+
+
+<!-- =========================
+     DASHBOARD
+========================= -->
+
+<section id="dashboard"
+         class="page active">
+
+    <div class="hero">
+
+        <h3>
+            Good day, Librarian 👋
+        </h3>
+
+        <p>
+            Manage your collection, members,
+            circulation and library activity
+            from one place.
+        </p>
+
+    </div>
+
+
+    <div class="stats"
+         id="stats">
+    </div>
+
+
+    <div class="grid2">
+
+
+        <div class="card">
+
+            <div class="chead">
+
+                <h3>
+                    Circulation Overview
+                </h3>
+
+                <span class="badge purple">
+                    LIVE
+                </span>
+
+            </div>
+
+            <div class="cbody"
+                 id="dashCirculation">
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="chead">
+
+                <h3>
+                    Library Alerts
+                </h3>
+
+            </div>
+
+            <div class="cbody"
+                 id="alerts">
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="chead">
+
+            <h3>
+                Recent Loans
+            </h3>
+
+            <button class="btn ghost"
+                    onclick="go('loans')">
+
+                View all
+
+            </button>
+
+        </div>
+
+        <div class="table"
+             id="dashLoans">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     BOOKS
+========================= -->
+
+<section id="books"
+         class="page">
+
+    <h1 class="title">
+        Books
+    </h1>
+
+    <p class="sub">
+        Search, monitor and add books
+        to the library catalog.
+    </p>
+
+
+    <div class="toolbar">
+
+        <div class="search">
+
+            <b>⌕</b>
+
+            <input
+                id="bookSearch"
+                placeholder="Search title, ISBN, author or shelf..."
+                oninput="loadBooks()">
+
+        </div>
+
+
+        <button class="btn primary"
+                onclick="openBookModal()">
+
+            ＋ Add Book
+
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="table"
+             id="booksTable">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     MEMBERS
+========================= -->
+
+<section id="members"
+         class="page">
+
+    <h1 class="title">
+        Members
+    </h1>
+
+    <p class="sub">
+        Manage library memberships
+        and borrowing limits.
+    </p>
+
+
+    <div class="toolbar">
+
+        <div class="search">
+
+            <b>⌕</b>
+
+            <input
+                id="memberSearch"
+                placeholder="Search member code, name, phone..."
+                oninput="loadMembers()">
+
+        </div>
+
+
+        <button class="btn primary"
+                onclick="openMemberModal()">
+
+            ＋ Add Member
+
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="table"
+             id="membersTable">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     LOANS
+========================= -->
+
+<section id="loans"
+         class="page">
+
+    <h1 class="title">
+        Issue & Return
+    </h1>
+
+    <p class="sub">
+        Track circulation, due dates
+        and overdue books.
+    </p>
+
+
+    <div class="toolbar">
+
+        <select id="loanFilter"
+                onchange="loadLoans()"
+                style="max-width:180px">
+
+            <option value="">
+                All loans
+            </option>
+
+            <option>
+                Issued
+            </option>
+
+            <option>
+                Returned
+            </option>
+
+            <option>
+                Overdue
+            </option>
+
+        </select>
+
+
+        <button class="btn primary"
+                onclick="openLoanModal()">
+
+            ＋ Issue Book
+
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="table"
+             id="loansTable">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     RESERVATIONS
+========================= -->
+
+<section id="reservations"
+         class="page">
+
+    <h1 class="title">
+        Reservations
+    </h1>
+
+    <p class="sub">
+        Manage book requests and
+        reserved copies.
+    </p>
+
+
+    <div class="toolbar">
+
+        <span class="muted"
+              style="font-size:12px;flex:1">
+
+            Reserve a book for an active member.
+
+        </span>
+
+
+        <button class="btn primary"
+                onclick="openReservationModal()">
+
+            ＋ New Reservation
+
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="table"
+             id="reservationsTable">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FINES
+========================= -->
+
+<section id="fines"
+         class="page">
+
+    <h1 class="title">
+        Fines
+    </h1>
+
+    <p class="sub">
+        Monitor overdue penalties
+        and record payments.
+    </p>
+
+
+    <div class="card">
+
+        <div class="table"
+             id="finesTable">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     STAFF
+========================= -->
+
+<section id="staff"
+         class="page">
+
+    <h1 class="title">
+        Library Staff
+    </h1>
+
+    <p class="sub">
+        Directory of administrators,
+        librarians and assistants.
+    </p>
+
+
+    <div class="card">
+
+        <div class="table"
+             id="staffTable">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CATALOG
+========================= -->
+
+<section id="catalog"
+         class="page">
+
+    <h1 class="title">
+        Catalog Data
+    </h1>
+
+    <p class="sub">
+        Authors, categories and publishers
+        available to the catalog.
+    </p>
+
+
+    <div class="grid2">
+
+
+        <div class="card">
+
+            <div class="chead">
+
+                <h3>
+                    Categories
+                </h3>
+
+            </div>
+
+            <div class="table"
+                 id="categoriesTable">
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="chead">
+
+                <h3>
+                    Authors
+                </h3>
+
+            </div>
+
+            <div class="table"
+                 id="authorsTable">
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="chead">
+
+            <h3>
+                Publishers
+            </h3>
+
+        </div>
+
+        <div class="table"
+             id="publishersTable">
+        </div>
+
+    </div>
+
+</section>
+
+
+</div>
+
+</main>
+
+
+<!-- =========================
+     MODAL
+========================= -->
+
+<div class="modal"
+     id="modal">
+
+    <div class="modalbox">
+
+        <div class="mh">
+
+            <h3 id="modalTitle">
+                Add
+            </h3>
+
+            <button class="close"
+                    onclick="closeModal()">
+
+                ×
+
+            </button>
+
+        </div>
+
+
+        <div class="mb"
+             id="modalBody">
+        </div>
+
+
+        <div class="mf">
+
+            <button class="btn ghost"
+                    onclick="closeModal()">
+
+                Cancel
+
+            </button>
+
+
+            <button class="btn primary"
+                    id="modalSave">
+
+                Save
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="toast"
+     id="toast">
+</div>
+
+
+<!-- =========================
+     JAVASCRIPT
+========================= -->
+
+<script>
+
+const API='/api';
+
+let cache={
+    books:[],
+    members:[],
+    categories:[],
+    authors:[],
+    publishers:[]
+};
+
+let current='dashboard';
+
+
+const $=id=>document.getElementById(id);
+
+
+const esc=x=>String(x??'')
+.replace(/[&<>"']/g,m=>({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+}[m]));
+
+
+const money=x=>
+    '₹'+Number(x||0)
+    .toLocaleString(
+        'en-IN',
+        {
+            maximumFractionDigits:2
+        }
+    );
+
+
+async function api(url,opts={}){
+
+    const r=await fetch(
+        API+url,
+        {
+            headers:{
+                'Content-Type':'application/json'
+            },
+            ...opts
+        }
+    );
+
+    const d=await r.json();
+
+    if(!r.ok)
+        throw Error(
+            d.error ||
+            'Request failed'
+        );
+
+    return d;
+}
+
+
+function toast(msg){
+
+    $('toast').textContent=msg;
+
+    $('toast').classList.add('show');
+
+    setTimeout(
+        ()=>$('toast')
+            .classList
+            .remove('show'),
+        2500
+    );
+}
+
+
+function go(page){
+
+    document
+        .querySelectorAll('.page')
+        .forEach(
+            x=>x.classList.remove('active')
+        );
+
+
+    $(page)
+        .classList
+        .add('active');
+
+
+    document
+        .querySelectorAll('.navitem')
+        .forEach(
+            x=>
+            x.classList.toggle(
+                'active',
+                x.dataset.page===page
+            )
+        );
+
+
+    current=page;
+
+
+    $('topTitle').textContent=
+        page==='loans'
+        ?'Issue & Return'
+        :page[0].toUpperCase()
+         +page.slice(1);
+
+
+    ({
+        dashboard:loadDashboard,
+        books:loadBooks,
+        members:loadMembers,
+        loans:loadLoans,
+        reservations:loadReservations,
+        fines:loadFines,
+        staff:loadStaff,
+        catalog:loadCatalog
+    }[page])();
+}
+
+
+document
+    .querySelectorAll('.navitem')
+    .forEach(
+        x=>
+        x.onclick=()=>
+        go(x.dataset.page)
+    );
+
+
+$('today').textContent=
+    new Date().toLocaleDateString(
+        'en-IN',
+        {
+            weekday:'short',
+            day:'2-digit',
+            month:'short',
+            year:'numeric'
+        }
+    );
+
+
+async function refreshCurrent(){
+
+    try{
+
+        await ({
+            dashboard:loadDashboard,
+            books:loadBooks,
+            members:loadMembers,
+            loans:loadLoans,
+            reservations:loadReservations,
+            fines:loadFines,
+            staff:loadStaff,
+            catalog:loadCatalog
+        }[current])();
+
+        toast('Data refreshed');
+
+    }catch(e){
+
+        toast(e.message);
+
+    }
+}
+
+
+/* =========================
+   DASHBOARD
+========================= */
+
+async function loadDashboard(){
+
+    const d=
+        await api('/dashboard');
+
+
+    $('stats').innerHTML=[
+
+        ['📚',d.books,'Book Titles',''],
+
+        ['👥',d.members,'Active Members',''],
+
+        ['↗',d.issued,'Books on Loan',''],
+
+        ['⚠',d.overdue,'Overdue Loans','']
+
+    ]
+    .map(x=>`
+
+        <div class="stat">
+
+            <div class="icon">
+                ${x[0]}
+            </div>
+
+            <div class="value">
+                ${x[1].toLocaleString()}
+            </div>
+
+            <div class="label">
+                ${x[2]}
+            </div>
+
+        </div>
+
+    `)
+    .join('');
+
+
+    let avail=
+        d.copies
+        ?Math.round(
+            d.available /
+            d.copies *
+            100
+        )
+        :0;
+
+
+    $('dashCirculation').innerHTML=`
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            margin-bottom:8px
+        ">
+
+            <span class="muted"
+                  style="font-size:11px">
+
+                Available copies
+
+            </span>
+
+            <b class="kpi">
+
+                ${d.available}/${d.copies}
+
+            </b>
+
+        </div>
+
+
+        <div class="bar">
+
+            <i style="
+                width:${avail}%
+            "></i>
+
+        </div>
+
+
+        <div style="
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+            margin-top:18px
+        ">
+
+            <div>
+
+                <span class="muted"
+                      style="font-size:10px">
+
+                    Low stock
+
+                </span>
+
+                <div class="kpi">
+                    ${d.low_stock}
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <span class="muted"
+                      style="font-size:10px">
+
+                    Fines collected
+
+                </span>
+
+                <div class="kpi">
+                    ${money(d.monthly_fines)}
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    $('alerts').innerHTML=
+
+        (
+            d.overdue
+
+            ?
+
+            `<div class="activity">
+
+                <i class="dot"
+                   style="background:var(--danger)">
+                </i>
+
+                <div>
+
+                    <strong>
+                        ${d.overdue}
+                        overdue loan(s)
+                    </strong>
+
+                    <small>
+                        Review Issue & Return
+                    </small>
+
+                </div>
+
+            </div>`
+
+            :
+
+            ''
+
+        )
+
+        +
+
+        (
+
+            d.low_stock
+
+            ?
+
+            `<div class="activity">
+
+                <i class="dot"
+                   style="background:var(--amber)">
+                </i>
+
+                <div>
+
+                    <strong>
+                        ${d.low_stock}
+                        title(s) low on copies
+                    </strong>
+
+                    <small>
+                        Consider acquiring more copies
+                    </small>
+
+                </div>
+
+            </div>`
+
+            :
+
+            ''
+
+        )
+
+        +
+
+        (
+
+            !d.overdue &&
+            !d.low_stock
+
+            ?
+
+            '<div class="empty">✓ No critical alerts</div>'
+
+            :
+
+            ''
+
+        );
+
+
+    const l=
+        await api('/loans');
+
+
+    $('dashLoans').innerHTML=
+        loanTable(
+            l.slice(0,6),
+            true
+        );
+}
+
+
+/* =========================
+   LOAN TABLE
+========================= */
+
+function loanTable(
+    rows,
+    compact=false
+){
+
+    if(!rows.length)
+
+        return `
+            <div class="empty">
+                No loan records found.
+            </div>
+        `;
+
+
+    return `
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Book
+                    </th>
+
+                    <th>
+                        Member
+                    </th>
+
+                    <th>
+                        Issue
+                    </th>
+
+                    <th>
+                        Due
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    ${
+                        compact
+                        ?''
+                        :'<th>Action</th>'
+                    }
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${rows.map(r=>`
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${esc(r.title)}
+                            </b>
+
+                            <div class="mono muted">
+                                ${esc(
+                                    r.isbn ||
+                                    'No ISBN'
+                                )}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            ${esc(r.member_name)}
+
+                            <div class="mono muted">
+                                ${esc(
+                                    r.member_code
+                                )}
+                            </div>
+
+                        </td>
+
+
+                        <td class="mono">
+                            ${esc(r.issue_date)}
+                        </td>
+
+
+                        <td class="mono">
+                            ${esc(r.due_date)}
+                        </td>
+
+
+                        <td>
+
+                            <span class="badge ${
+                                r.status==='Returned'
+                                ?'green'
+                                :
+                                r.status==='Overdue' ||
+                                (
+                                    r.status==='Issued' &&
+                                    r.due_date<
+                                    new Date()
+                                    .toISOString()
+                                    .slice(0,10)
+                                )
+                                ?'red'
+                                :'blue'
+                            }">
+
+                                ${
+                                    r.status==='Issued' &&
+                                    r.due_date<
+                                    new Date()
+                                    .toISOString()
+                                    .slice(0,10)
+
+                                    ?
+
+                                    'Overdue'
+
+                                    :
+
+                                    r.status
+                                }
+
+                            </span>
+
+                        </td>
+
+
+                        ${
+                            compact
+
+                            ?
+
+                            ''
+
+                            :
+
+                            `<td>
+
+                                ${
+                                    !r.return_date
+
+                                    ?
+
+                                    `
+                                    <button
+                                        class="btn ghost"
+                                        onclick="returnLoan(${r.loan_id})">
+
+                                        Return
+
+                                    </button>
+                                    `
+
+                                    :
+
+                                    ''
+
+                                }
+
+                            </td>`
+                        }
+
+                    </tr>
+
+                `).join('')}
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+/* =========================
+   BOOKS
+========================= */
+
+async function loadBooks(){
+
+    cache.books=
+        await api(
+            '/books?search='+
+            encodeURIComponent(
+                $('bookSearch')?.value||''
+            )
+        );
+
+
+    $('booksTable').innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Book
+                    </th>
+
+                    <th>
+                        Author
+                    </th>
+
+                    <th>
+                        Category
+                    </th>
+
+                    <th>
+                        Copies
+                    </th>
+
+                    <th>
+                        Shelf
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${cache.books.map(b=>`
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${esc(b.title)}
+                            </b>
+
+                            <div class="mono muted">
+                                ${esc(
+                                    b.isbn ||
+                                    'No ISBN'
+                                )}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+                            ${esc(
+                                b.author_name ||
+                                '—'
+                            )}
+                        </td>
+
+
+                        <td>
+                            ${esc(
+                                b.category_name ||
+                                '—'
+                            )}
+                        </td>
+
+
+                        <td>
+
+                            <b>
+                                ${b.available_copies}
+                            </b>
+
+                            /
+                            ${b.total_copies}
+
+                        </td>
+
+
+                        <td class="mono">
+                            ${esc(
+                                b.shelf_location ||
+                                '—'
+                            )}
+                        </td>
+
+
+                        <td>
+
+                            <span class="badge ${
+                                b.status==='Available'
+                                ?'green'
+                                :
+                                b.status==='Low Stock'
+                                ?'amber'
+                                :'red'
+                            }">
+
+                                ${b.status}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                `).join('')}
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+/* =========================
+   MEMBERS
+========================= */
+
+async function loadMembers(){
+
+    cache.members=
+        await api(
+            '/members?search='+
+            encodeURIComponent(
+                $('memberSearch')?.value||''
+            )
+        );
+
+
+    $('membersTable').innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Member
+                    </th>
+
+                    <th>
+                        Contact
+                    </th>
+
+                    <th>
+                        Type
+                    </th>
+
+                    <th>
+                        Membership
+                    </th>
+
+                    <th>
+                        Limit
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${cache.members.map(m=>`
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${esc(
+                                    m.first_name+
+                                    ' '+
+                                    (m.last_name||'')
+                                )}
+                            </b>
+
+                            <div class="mono muted">
+                                ${esc(
+                                    m.member_code
+                                )}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            ${esc(m.phone)}
+
+                            <div class="muted">
+                                ${esc(
+                                    m.email||''
+                                )}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+                            ${esc(
+                                m.membership_type
+                            )}
+                        </td>
+
+
+                        <td class="mono">
+
+                            ${esc(m.join_date)}
+
+                            →
+
+                            ${esc(
+                                m.expiry_date||
+                                '—'
+                            )}
+
+                        </td>
+
+
+                        <td>
+                            ${m.max_books}
+                        </td>
+
+
+                        <td>
+
+                            <span class="badge ${
+                                m.status==='Active'
+                                ?'green'
+                                :
+                                m.status==='Suspended'
+                                ?'red'
+                                :'amber'
+                            }">
+
+                                ${m.status}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                `).join('')}
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+/* =========================
+   LOANS
+========================= */
+
+async function loadLoans(){
+
+    const f=
+        $('loanFilter').value;
+
+
+    const rows=
+        await api(
+            '/loans'+
+            (
+                f
+                ?
+                '?status='+f
+                :
+                ''
+            )
+        );
+
+
+    $('loansTable').innerHTML=
+        loanTable(rows);
+}
+
+
+/* =========================
+   RETURN BOOK
+========================= */
+
+async function returnLoan(id){
+
+    if(
+        !confirm(
+            'Mark this book as returned?'
+        )
+    )
+
+        return;
+
+
+    try{
+
+        const d=
+            await api(
+                '/loans/'+id+'/return',
+                {
+                    method:'POST',
+                    body:JSON.stringify({})
+                }
+            );
+
+
+        toast(
+            d.fine
+            ?
+            `Returned. Fine generated: ${money(d.fine)}`
+            :
+            'Book returned successfully'
+        );
+
+
+        loadLoans();
+
+    }catch(e){
+
+        toast(e.message);
+
+    }
+}
+
+
+/* =========================
+   RESERVATIONS
+========================= */
+
+async function loadReservations(){
+
+    const r=
+        await api(
+            '/reservations'
+        );
+
+
+    $('reservationsTable').innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Book
+                    </th>
+
+                    <th>
+                        Member
+                    </th>
+
+                    <th>
+                        Reserved
+                    </th>
+
+                    <th>
+                        Expiry
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${r.map(x=>`
+
+                    <tr>
+
+                        <td>
+                            <b>
+                                ${esc(x.title)}
+                            </b>
+                        </td>
+
+
+                        <td>
+
+                            ${esc(
+                                x.member_name
+                            )}
+
+                            <div class="mono muted">
+                                ${esc(
+                                    x.member_code
+                                )}
+                            </div>
+
+                        </td>
+
+
+                        <td class="mono">
+
+                            ${
+                                new Date(
+                                    x.reservation_date
+                                ).toLocaleDateString()
+                            }
+
+                        </td>
+
+
+                        <td class="mono">
+
+                            ${esc(
+                                x.expiry_date||
+                                '—'
+                            )}
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="badge purple">
+                                ${esc(x.status)}
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                `).join('')}
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+/* =========================
+   FINES
+========================= */
+
+async function loadFines(){
+
+    const r=
+        await api('/fines');
+
+
+    $('finesTable').innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Member
+                    </th>
+
+                    <th>
+                        Book
+                    </th>
+
+                    <th>
+                        Reason
+                    </th>
+
+                    <th>
+                        Amount
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${r.map(x=>`
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${esc(
+                                    x.member_name
+                                )}
+                            </b>
+
+                            <div class="mono muted">
+                                ${esc(
+                                    x.member_code
+                                )}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+                            ${esc(x.title)}
+                        </td>
+
+
+                        <td>
+                            ${esc(x.reason)}
+                        </td>
+
+
+                        <td>
+
+                            <b>
+                                ${money(x.amount)}
+                            </b>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="badge ${
+                                x.status==='Paid'
+                                ?'green'
+                                :'red'
+                            }">
+
+                                ${x.status}
+
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            ${
+                                x.status==='Pending'
+
+                                ?
+
+                                `
+                                <button
+                                    class="btn ghost"
+                                    onclick="payFine(${x.fine_id})">
+
+                                    Mark Paid
+
+                                </button>
+                                `
+
+                                :
+
+                                '—'
+                            }
+
+                        </td>
+
+                    </tr>
+
+                `).join('')}
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+async function payFine(id){
+
+    await api(
+        '/fines/'+id+'/pay',
+        {
+            method:'POST',
+            body:'{}'
+        }
+    );
+
+
+    toast(
+        'Fine marked as paid'
+    );
+
+
+    loadFines();
+
+    loadDashboard();
+}
+
+
+/* =========================
+   STAFF
+========================= */
+
+async function loadStaff(){
+
+    const r=
+        await api('/staff');
+
+
+    $('staffTable').innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Staff
+                    </th>
+
+                    <th>
+                        Contact
+                    </th>
+
+                    <th>
+                        Role
+                    </th>
+
+                    <th>
+                        Joined
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${r.map(x=>`
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${esc(
+                                    x.first_name+
+                                    ' '+
+                                    (x.last_name||'')
+                                )}
+                            </b>
+
+                        </td>
+
+
+                        <td>
+
+                            ${esc(x.email)}
+
+                            <div class="muted">
+                                ${esc(
+                                    x.phone||''
+                                )}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            <span class="badge purple">
+
+                                ${esc(x.role)}
+
+                            </span>
+
+                        </td>
+
+
+                        <td class="mono">
+                            ${esc(
+                                x.joined_date
+                            )}
+                        </td>
+
+
+                        <td>
+
+                            <span class="badge green">
+
+                                ${esc(x.status)}
+
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                `).join('')}
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+/* =========================
+   CATALOG
+========================= */
+
+async function loadCatalog(){
+
+    [
+        cache.categories,
+        cache.authors,
+        cache.publishers
+
+    ]=
+
+        await Promise.all([
+
+            api('/categories'),
+
+            api('/authors'),
+
+            api('/publishers')
+
+        ]);
+
+
+    $('categoriesTable').innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Category
+                    </th>
+
+                    <th>
+                        Description
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${cache.categories.map(x=>`
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${esc(
+                                    x.category_name
+                                )}
+                            </b>
+
+                        </td>
+
+                        <td class="muted">
+
+                            ${esc(
+                                x.description||''
+                            )}
+
+                        </td>
+
+                    </tr>
+
+                `).join('')}
+
+            </tbody>
+
+        </table>
+
+    `;
+
+
+    $('authorsTable').innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Author
+                    </th>
+
+                    <th>
+                        Country
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${cache.authors.map(x=>`
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${esc(
+                                    x.author_name
+                                )}
+                            </b>
+
+                        </td>
+
+                        <td>
+
+                            ${esc(
+                                x.country||
+                                '—'
+                            )}
+
+                        </td>
+
+                    </tr>
+
+                `).join('')}
+
+            </tbody>
+
+        </table>
+
+    `;
+
+
+    $('publishersTable').innerHTML=`
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Publisher
+                    </th>
+
+                    <th>
+                        Contact
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                ${cache.publishers.map(x=>`
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${esc(
+                                    x.publisher_name
+                                )}
+                            </b>
+
+                        </td>
+
+                        <td>
+
+                            ${esc(
+                                x.email||''
+                            )}
+
+                            <br>
+
+                            ${esc(
+                                x.phone||''
+                            )}
+
+                        </td>
+
+                    </tr>
+
+                `).join('')}
+
+            </tbody>
+
+        </table>
+
+    `;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+function openModal(
+    title,
+    body,
+    save
+){
+
+    $('modalTitle').textContent=
+        title;
+
+    $('modalBody').innerHTML=
+        body;
+
+    $('modalSave').onclick=
+        save;
+
+    $('modal')
+        .classList
+        .add('open');
+}
+
+
+function closeModal(){
+
+    $('modal')
+        .classList
+        .remove('open');
+
+}
+
+
+/* =========================
+   SELECT OPTIONS
+========================= */
+
+function opts(
+    a,
+    label,
+    value=''
+){
+
+    return `
+
+        <option value="">
+            ${label}
+        </option>
+
+    `+
+
+    a.map(
+        x=>`
+
+            <option
+                value="${
+                    x.category_id||
+                    x.author_id||
+                    x.publisher_id
+                }">
+
+                ${
+                    esc(
+                        x.category_name||
+                        x.author_name||
+                        x.publisher_name
+                    )
+                }
+
+            </option>
+
+        `
+    ).join('');
+}
+
+
+/* =========================
+   ADD BOOK MODAL
+========================= */
+
+function openBookModal(){
+
+    openModal(
+
+        'Add New Book',
+
+        `
+
+        <div class="formgrid">
+
+            <div class="fg">
+
+                <label>
+                    Title *
+                </label>
+
+                <input id="f_title">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    ISBN
+                </label>
+
+                <input id="f_isbn">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Author
+                </label>
+
+                <select id="f_author">
+
+                    ${opts(
+                        cache.authors,
+                        'Select author'
+                    )}
+
+                </select>
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Category
+                </label>
+
+                <select id="f_cat">
+
+                    ${opts(
+                        cache.categories,
+                        'Select category'
+                    )}
+
+                </select>
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Publisher
+                </label>
+
+                <select id="f_pub">
+
+                    ${opts(
+                        cache.publishers,
+                        'Select publisher'
+                    )}
+
+                </select>
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Publication Year
+                </label>
+
+                <input
+                    id="f_year"
+                    type="number">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Edition
+                </label>
+
+                <input id="f_edition">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Language
+                </label>
+
+                <input
+                    id="f_lang"
+                    value="English">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Shelf Location
+                </label>
+
+                <input
+                    id="f_shelf"
+                    placeholder="CS-A01">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Total Copies
+                </label>
+
+                <input
+                    id="f_copies"
+                    type="number"
+                    min="1"
+                    value="1">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Price
+                </label>
+
+                <input
+                    id="f_price"
+                    type="number"
+                    step=".01"
+                    value="0">
+
+            </div>
+
+
+            <div class="fg full">
+
+                <label>
+                    Description
+                </label>
+
+                <textarea id="f_desc"></textarea>
+
+            </div>
+
+        </div>
+
+        `,
+
+        async()=>{
+
+            try{
+
+                await api(
+                    '/books',
+                    {
+                        method:'POST',
+
+                        body:JSON.stringify({
+
+                            title:
+                                $('f_title').value,
+
+                            isbn:
+                                $('f_isbn').value,
+
+                            author_id:
+                                $('f_author').value,
+
+                            category_id:
+                                $('f_cat').value,
+
+                            publisher_id:
+                                $('f_pub').value,
+
+                            publication_year:
+                                $('f_year').value,
+
+                            edition:
+                                $('f_edition').value,
+
+                            language:
+                                $('f_lang').value,
+
+                            shelf_location:
+                                $('f_shelf').value,
+
+                            total_copies:
+                                $('f_copies').value,
+
+                            price:
+                                $('f_price').value,
+
+                            description:
+                                $('f_desc').value
+
+                        })
+
+                    }
+                );
+
+
+                closeModal();
+
+                toast(
+                    'Book added successfully'
+                );
+
+                loadBooks();
+
+                loadDashboard();
+
+
+            }catch(e){
+
+                toast(e.message);
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* =========================
+   ADD MEMBER MODAL
+========================= */
+
+function openMemberModal(){
+
+    openModal(
+
+        'Add New Member',
+
+        `
+
+        <div class="formgrid">
+
+            <div class="fg">
+
+                <label>
+                    Member Code *
+                </label>
+
+                <input
+                    id="m_code"
+                    placeholder="LIB-1006">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    First Name *
+                </label>
+
+                <input id="m_first">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Last Name
+                </label>
+
+                <input id="m_last">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Phone *
+                </label>
+
+                <input id="m_phone">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    id="m_email"
+                    type="email">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Membership Type
+                </label>
+
+                <select id="m_type">
+
+                    <option>
+                        Student
+                    </option>
+
+                    <option>
+                        Faculty
+                    </option>
+
+                    <option>
+                        Staff
+                    </option>
+
+                    <option>
+                        Public
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Join Date *
+                </label>
+
+                <input
+                    id="m_join"
+                    type="date"
+                    value="${
+                        new Date()
+                        .toISOString()
+                        .slice(0,10)
+                    }">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Expiry Date
+                </label>
+
+                <input
+                    id="m_exp"
+                    type="date">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Maximum Books
+                </label>
+
+                <input
+                    id="m_max"
+                    type="number"
+                    value="3">
+
+            </div>
+
+
+            <div class="fg full">
+
+                <label>
+                    Address
+                </label>
+
+                <textarea
+                    id="m_addr">
+                </textarea>
+
+            </div>
+
+        </div>
+
+        `,
+
+        async()=>{
+
+            try{
+
+                await api(
+                    '/members',
+                    {
+                        method:'POST',
+
+                        body:JSON.stringify({
+
+                            member_code:
+                                $('m_code').value,
+
+                            first_name:
+                                $('m_first').value,
+
+                            last_name:
+                                $('m_last').value,
+
+                            phone:
+                                $('m_phone').value,
+
+                            email:
+                                $('m_email').value,
+
+                            membership_type:
+                                $('m_type').value,
+
+                            join_date:
+                                $('m_join').value,
+
+                            expiry_date:
+                                $('m_exp').value,
+
+                            max_books:
+                                $('m_max').value,
+
+                            address:
+                                $('m_addr').value
+
+                        })
+
+                    }
+                );
+
+
+                closeModal();
+
+                toast(
+                    'Member added successfully'
+                );
+
+                loadMembers();
+
+                loadDashboard();
+
+
+            }catch(e){
+
+                toast(e.message);
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* =========================
+   ISSUE BOOK MODAL
+========================= */
+
+async function openLoanModal(){
+
+    if(!cache.books.length)
+
+        cache.books=
+            await api('/books');
+
+
+    if(!cache.members.length)
+
+        cache.members=
+            await api('/members');
+
+
+    openModal(
+
+        'Issue Book',
+
+        `
+
+        <div class="formgrid">
+
+
+            <div class="fg full">
+
+                <label>
+                    Book *
+                </label>
+
+                <select id="l_book">
+
+                    <option value="">
+                        Select available book
+                    </option>
+
+                    ${cache.books
+                        .filter(
+                            x=>x.available_copies>0
+                        )
+                        .map(
+                            x=>`
+
+                                <option
+                                    value="${x.book_id}">
+
+                                    ${esc(x.title)}
+                                    —
+                                    ${x.available_copies}
+                                    available
+
+                                </option>
+
+                            `
+                        )
+                        .join('')}
+
+                </select>
+
+            </div>
+
+
+            <div class="fg full">
+
+                <label>
+                    Member *
+                </label>
+
+                <select id="l_member">
+
+                    <option value="">
+                        Select active member
+                    </option>
+
+                    ${cache.members
+                        .filter(
+                            x=>x.status==='Active'
+                        )
+                        .map(
+                            x=>`
+
+                                <option
+                                    value="${x.member_id}">
+
+                                    ${esc(
+                                        x.member_code
+                                    )}
+
+                                    —
+
+                                    ${esc(
+                                        x.first_name+
+                                        ' '+
+                                        (x.last_name||'')
+                                    )}
+
+                                </option>
+
+                            `
+                        )
+                        .join('')}
+
+                </select>
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Issue Date
+                </label>
+
+                <input
+                    id="l_issue"
+                    type="date"
+                    value="${
+                        new Date()
+                        .toISOString()
+                        .slice(0,10)
+                    }">
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Due Date
+                </label>
+
+                <input
+                    id="l_due"
+                    type="date"
+                    value="${
+                        new Date(
+                            Date.now()+
+                            14*86400000
+                        )
+                        .toISOString()
+                        .slice(0,10)
+                    }">
+
+            </div>
+
+
+            <div class="fg full">
+
+                <label>
+                    Notes
+                </label>
+
+                <textarea id="l_notes"></textarea>
+
+            </div>
+
+
+        </div>
+
+        `,
+
+        async()=>{
+
+            try{
+
+                await api(
+                    '/loans',
+                    {
+                        method:'POST',
+
+                        body:JSON.stringify({
+
+                            book_id:
+                                $('l_book').value,
+
+                            member_id:
+                                $('l_member').value,
+
+                            issue_date:
+                                $('l_issue').value,
+
+                            due_date:
+                                $('l_due').value,
+
+                            notes:
+                                $('l_notes').value
+
+                        })
+
+                    }
+                );
+
+
+                closeModal();
+
+                toast(
+                    'Book issued successfully'
+                );
+
+
+                loadLoans();
+
+                loadDashboard();
+
+
+                cache.books=[];
+
+                cache.members=[];
+
+
+            }catch(e){
+
+                toast(e.message);
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* =========================
+   RESERVATION MODAL
+========================= */
+
+async function openReservationModal(){
+
+    if(!cache.books.length)
+
+        cache.books=
+            await api('/books');
+
+
+    if(!cache.members.length)
+
+        cache.members=
+            await api('/members');
+
+
+    openModal(
+
+        'New Reservation',
+
+        `
+
+        <div class="formgrid">
+
+
+            <div class="fg full">
+
+                <label>
+                    Book *
+                </label>
+
+                <select id="r_book">
+
+                    ${cache.books
+                        .map(
+                            x=>`
+
+                                <option
+                                    value="${x.book_id}">
+
+                                    ${esc(x.title)}
+
+                                </option>
+
+                            `
+                        )
+                        .join('')}
+
+                </select>
+
+            </div>
+
+
+            <div class="fg full">
+
+                <label>
+                    Member *
+                </label>
+
+                <select id="r_member">
+
+                    ${cache.members
+                        .filter(
+                            x=>x.status==='Active'
+                        )
+                        .map(
+                            x=>`
+
+                                <option
+                                    value="${x.member_id}">
+
+                                    ${esc(
+                                        x.member_code
+                                    )}
+
+                                    —
+
+                                    ${esc(
+                                        x.first_name+
+                                        ' '+
+                                        (x.last_name||'')
+                                    )}
+
+                                </option>
+
+                            `
+                        )
+                        .join('')}
+
+                </select>
+
+            </div>
+
+
+            <div class="fg">
+
+                <label>
+                    Expiry Date
+                </label>
+
+                <input
+                    id="r_exp"
+                    type="date"
+                    value="${
+                        new Date(
+                            Date.now()+
+                            3*86400000
+                        )
+                        .toISOString()
+                        .slice(0,10)
+                    }">
+
+            </div>
+
+
+        </div>
+
+        `,
+
+        async()=>{
+
+            try{
+
+                await api(
+                    '/reservations',
+                    {
+                        method:'POST',
+
+                        body:JSON.stringify({
+
+                            book_id:
+                                $('r_book').value,
+
+                            member_id:
+                                $('r_member').value,
+
+                            expiry_date:
+                                $('r_exp').value
+
+                        })
+
+                    }
+                );
+
+
+                closeModal();
+
+                toast(
+                    'Reservation created'
+                );
+
+                loadReservations();
+
+
+            }catch(e){
+
+                toast(e.message);
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* =========================
+   START APPLICATION
+========================= */
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
